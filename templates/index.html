@@ -36,16 +36,12 @@
             width: 80%;
             max-width: 600px;
             min-height: 200px;
-            /* Altura mínima para asegurar que siempre haya espacio para el contenido */
             text-align: center;
             cursor: pointer;
             transition: background 0.3s ease, border-color 0.3s ease;
             overflow-y: auto;
-            /* Permitir desplazamiento vertical */
             overflow-x: hidden;
-            /* Evitar el desbordamiento horizontal */
             white-space: normal;
-            /* Permitir que el contenido se ajuste a nuevas líneas */
         }
 
         .dropzone:hover {
@@ -116,13 +112,14 @@
 </head>
 
 <body>
-    <h1>File Upload</h1>
+    <h1>File Upload - {{ session["user_id"]["username"] }}</h1>
     <form action="{{ url_for('upload_files') }}" class="dropzone" enctype="multipart/form-data">
     </form>
     <div class="file-container">
         {% for file in files %}
         <div class="file-item">
-            <img src="{{ url_for('upload', filename=file) }}" alt="{{file}}">
+            <img src="{{ url_for('upload', filename=file) }}" alt="{{file}}" title="{{file}}"
+                onclick="window.open(`{{ url_for('upload', filename=file) }}`,'_blank') ">
         </div>
         {% endfor %}
     </div>
