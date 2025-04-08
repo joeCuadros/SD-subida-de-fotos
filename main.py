@@ -19,6 +19,17 @@ def validate_image(stream):
         return None
     return '.' + (format if format != 'jpeg' else 'jpg')
 
+# 
+def get_unique_filename(upload_path, filename):
+    base_name, ext = os.path.splitext(filename)
+    counter = 1
+    new_filename = filename
+    
+    while os.path.exists(os.path.join(upload_path, new_filename)):
+        new_filename = f"{base_name}({counter}){ext}"
+        counter += 1
+    
+    return new_filename
 #### VISTAS
 # vista principal
 @app.route('/')
@@ -32,6 +43,7 @@ def index():
 def too_large(e):
     return "File is too large", 413
 
+# logica de subir el archivo
 @app.route('/', methods=['POST'])
 def upload_files():
     uploaded_file = request.files['file']
@@ -43,9 +55,11 @@ def upload_files():
                 file_ext != validate_image(uploaded_file.stream):
             return 'Invalid image', 400
         os.makedirs(app.config['UPLOAD_PATH'], exist_ok=True) # crear si no existe la ruta
-        uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+        unique_filename = get_unique_filename(app.config['UPLOAD_PATH'], filename) # archivo unico
+        uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], unique_filename))
     return '', 204
 
+# Retorna la imagen subida del servidor
 @app.route('/uploads/<filename>')
 def upload(filename):
     return send_from_directory(app.config['UPLOAD_PATH'], filename)

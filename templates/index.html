@@ -7,15 +7,125 @@
     <title>Index</title>
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .dropzone {
+            background: #ffffff;
+            border: 2px dashed #3498db;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            min-height: 200px;
+            /* Altura mínima para asegurar que siempre haya espacio para el contenido */
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            overflow-y: auto;
+            /* Permitir desplazamiento vertical */
+            overflow-x: hidden;
+            /* Evitar el desbordamiento horizontal */
+            white-space: normal;
+            /* Permitir que el contenido se ajuste a nuevas líneas */
+        }
+
+        .dropzone:hover {
+            background-color: #ecf6fd;
+            border-color: #2980b9;
+        }
+
+        .dropzone .dz-message {
+            font-size: 1.2em;
+            color: #3498db;
+        }
+
+        .file-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .file-container img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .file-container img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .dropzone {
+                width: 90%;
+                padding: 30px;
+            }
+
+            .file-container img {
+                width: 80px;
+                height: 80px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .dropzone {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .file-container img {
+                width: 60px;
+                height: 60px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <h1>File Upload</h1>
-    <form action="{{ url_for('upload_files') }}" class="dropzone">
+    <form action="{{ url_for('upload_files') }}" class="dropzone" enctype="multipart/form-data">
     </form>
-    {% for file in files %}
-      <img src="{{ url_for('upload', filename=file) }}" style="width: 64px">
-    {% endfor %}
+    <div class="file-container">
+        {% for file in files %}
+        <div class="file-item">
+            <img src="{{ url_for('upload', filename=file) }}" alt="{{file}}">
+        </div>
+        {% endfor %}
+    </div>
 </body>
 
 </html>
