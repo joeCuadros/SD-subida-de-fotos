@@ -1,5 +1,5 @@
 import imghdr, os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 from werkzeug.utils import secure_filename
 
 
@@ -23,7 +23,9 @@ def validate_image(stream):
 # vista principal
 @app.route('/')
 def index():
-    return render_template('index.html')
+    os.makedirs(app.config['UPLOAD_PATH'], exist_ok=True) # crear si no existe la ruta
+    files = os.listdir(app.config['UPLOAD_PATH'])
+    return render_template('index.html', files=files)
 
 # Error en caso que se mayor
 @app.errorhandler(413)
@@ -40,10 +42,13 @@ def upload_files():
         if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
                 file_ext != validate_image(uploaded_file.stream):
             return 'Invalid image', 400
-        os.makedirs(app.config['UPLOAD_PATH'], exist_ok=True) # validar si existe la ruta
+        os.makedirs(app.config['UPLOAD_PATH'], exist_ok=True) # crear si no existe la ruta
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
     return '', 204
 
+@app.route('/uploads/<filename>')
+def upload(filename):
+    return send_from_directory(app.config['UPLOAD_PATH'], filename)
 
 if __name__ == "__main__":
     # ejecutando configuracion

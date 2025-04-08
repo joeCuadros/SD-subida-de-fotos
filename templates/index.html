@@ -13,6 +13,9 @@
     <h1>File Upload</h1>
     <form action="{{ url_for('upload_files') }}" class="dropzone">
     </form>
+    {% for file in files %}
+      <img src="{{ url_for('upload', filename=file) }}" style="width: 64px">
+    {% endfor %}
 </body>
 
 </html>
