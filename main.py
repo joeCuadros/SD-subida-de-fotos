@@ -1,25 +1,25 @@
 import imghdr, os
 from flask import Flask, render_template, request, send_from_directory, url_for, session, redirect, flash
 from werkzeug.utils import secure_filename
-
-
+from werkzeug.security import check_password_hash #,generate_password_hash, 
+"""
+generate_password_hash(contraseña) #genera contraseña
+"""
 # Configuracion del servidor
 app = Flask(__name__)
 app.config['UPLOAD_PATH'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # max 2 MB
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
-app.secret_key = 'super_secret_key@'
+app.secret_key = 'qpTI!vMBI1FpkvEkQ4*X^afdcSu0zhvi'
 app.config.update(
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax'
+    SESSION_COOKIE_HTTPONLY=True #no se puede leer por javascript
 )
-
+# usuario con contraseñas encriptadas
 users = {
-    'joe': {'password': '12345678', 'id': 1},
-    'misael': {'password': '12345678', 'id': 2},
-    'sebastian': {'password': '12345678', 'id': 3},
-    'rodrigo': {'password': '12345678', 'id': 4},
+    'joe': {'id': 1,'password': 'scrypt:32768:8:1$YuLFzGcwJVbaou7G$2c9c2f21d858a2121d10644537c872c5efbe9d39825e6139fc3e6ebccd668a770242fd42a872cce9fc5148657d532991ecedf497ca79339ddbf5403c4df2f28d'},
+    'misael': {'id': 2,'password': 'scrypt:32768:8:1$LPOUjOJrmGFshjyD$724a223d766c805912eee91f02b24214c6fd427d9645fae3bbb857f2e67aa3badd1e6b23f5c8073ee5839f17dd0307a40e062864449edbd0e6ef379aadb94dba'},
+    'sebastian': {'id': 3,'password': 'scrypt:32768:8:1$x81vogaNFuwwWboO$ec5c0a2a8c1a6f3362ec0faf2347f1885b99584d0265eeadfce52df5c401cc699f5e5a9536ec18c3da6281238e79a29e5b261675c9d52d99e765ff6d9064040a'},
+    'rodrigo': {'id': 4,'password': 'scrypt:32768:8:1$sXzsAW3BMK2QRA5F$23be256b413782396d45f28ca790eadf54474f21a31a8fcf4467c7b738e09a4bffc75b2ce333f51ad8b7800e307a85e5a371efe5a4d636b96021b5eed5b8e02f'},
 }
 
 # Decorador para proteger las rutas privadas
@@ -58,10 +58,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        # validar si existe usuario
         if username in users:
             # Verificar la contraseña
-            if users[username]['password'] == password:
+            if check_password_hash(users[username]['password'],password):
                 user_id = users[username]['id']
                 session['user_id'] = {"id": user_id, "username": username}
                 return redirect(url_for('index'))
@@ -75,7 +74,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
-    flash('Logout successful.','success') # mandar error
+    flash('Logout successful.','success') # mandar notificacion
     return redirect(url_for('login')) 
 
 # vista principal
@@ -128,3 +127,4 @@ def upload(filename):
 if __name__ == "__main__":
     # ejecutando configuracion
     app.run(host="0.0.0.0",port=5000,debug=True)
+    
